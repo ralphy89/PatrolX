@@ -1,0 +1,180 @@
+/* Import des styles Leaflet */
+@import 'leaflet/dist/leaflet.css';
+
+/* Performance: Désactiver les animations pour prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .commune-polygon,
+  .selected-commune,
+  .commune-high-alert,
+  .commune-alert-low,
+  .commune-alert-medium,
+  .commune-alert-high {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* GPU acceleration pour meilleure performance */
+.commune-polygon {
+  will-change: opacity, filter;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Styles personnalisés pour les labels des communes */
+.commune-label {
+  font-family: 'Inter', sans-serif;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.commune-label:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.commune-label-container {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Tooltip personnalisé */
+.commune-tooltip .leaflet-tooltip {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  font-family: 'Inter', sans-serif;
+}
+
+.leaflet-tooltip-top:before {
+  border-top-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.leaflet-tooltip-bottom:before {
+  border-bottom-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.leaflet-container {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Style pour les polygones sélectionnés */
+.leaflet-interactive.selected-commune {
+  stroke-width: 3 !important;
+  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6));
+}
+
+/* Styles pour les limites de la carte */
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+  touch-action: pan-x pan-y;
+}
+
+.leaflet-container.reached-bounds {
+  cursor: not-allowed;
+}
+
+/* Animation douce pour le rebond */
+.leaflet-pan-anim .leaflet-tile,
+.leaflet-zoom-anim .leaflet-tile {
+  transition: transform 0.25s cubic-bezier(0,0,0.25,1);
+}
+
+/* ANIMATIONS OPTIMISÉES */
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+    filter: drop-shadow(0 0 5px currentColor);
+  }
+  50% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 15px currentColor);
+  }
+  100% {
+    opacity: 0.4;
+    filter: drop-shadow(0 0 5px currentColor);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    opacity: 0.3;
+    filter: drop-shadow(0 0 2px currentColor);
+  }
+  50% {
+    opacity: 0.6;
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  25% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  75% {
+    opacity: 0.9;
+    transform: scale(1.01);
+  }
+}
+
+.commune-polygon {
+  transition: all 0.3s ease;
+}
+
+.commune-polygon:hover {
+  filter: drop-shadow(0 0 10px currentColor);
+}
+
+.selected-commune {
+  animation: pulse 2s ease-in-out infinite !important;
+  filter: drop-shadow(0 0 20px currentColor);
+}
+
+.commune-high-alert {
+  animation: sparkle 1.5s ease-in-out infinite !important;
+}
+
+.commune-alert-low {
+  animation: glow 3s ease-in-out infinite !important;
+}
+
+.commune-alert-medium {
+  animation: glow 2s ease-in-out infinite !important;
+}
+
+.commune-alert-high {
+  animation: glow 1s ease-in-out infinite !important;
+}
+
+.animated-border {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    currentColor,
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
