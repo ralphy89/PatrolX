@@ -4,6 +4,7 @@ import { askQuestion } from '../api/api'
 import ChatMessage from './ChatMessage'
 import { handleApiError } from '../utils/errors'
 import { useOnlineStatus } from '../hooks/useOnlineStatus'
+import { MapPin, AlertTriangle } from 'lucide-react'
 
 // Fonction utilitaire pour décoder les caractères encodés en URL
 const decodeHtmlEntities = (text) => {
@@ -107,14 +108,6 @@ const Chat = ({ onClose, isMobile }) => {
   useEffect(() => {
     if (!activeZone && selectedZone && selectedZone.length === 0) {
       lastDisplayedZoneRef.current = null // Reset le ref
-      if (messages.length === 0) {
-        addMessage({
-          text: 'Sélectionnez une zone sur la carte pour voir son état des lieux.',
-          isUser: false,
-          timestamp: Date.now(),
-          isAIResponse: false, // Message système, pas de typing
-        })
-      }
     }
   }, [activeZone, selectedZone?.length, addMessage, messages.length])
 
@@ -187,12 +180,12 @@ const Chat = ({ onClose, isMobile }) => {
 
       addMessage(aiMessage);
     } catch (error) {
-      addMessage({
-        text: `⚠️ ${handleApiError(error)}`,
-        isUser: false,
-        timestamp: Date.now(),
-        isAIResponse: false, // Message d'erreur, pas de typing
-      });
+            addMessage({
+              text: `${handleApiError(error)}`,
+              isUser: false,
+              timestamp: Date.now(),
+              isAIResponse: false, // Message d'erreur, pas de typing
+            });
     } finally {
       setChatLoading(false);
     }
@@ -200,31 +193,33 @@ const Chat = ({ onClose, isMobile }) => {
 
 
   return (
-    <div className="flex flex-col h-full bg-black">
+    <div className="flex flex-col h-full bg-white dark:bg-black">
       {/* Header */}
-      <div className="px-4 md:px-6 py-3 md:py-4 border-b border-neon-green/30 flex items-center justify-between shrink-0 bg-black relative overflow-hidden">
+      <div className="px-4 md:px-6 py-3 md:py-4 border-b border-emerald-200 dark:border-neon-green/30 flex items-center justify-between shrink-0 bg-white dark:bg-black relative overflow-hidden">
         {/* Subtle grid pattern background */}
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(rgba(0,255,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,0,0.1) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+        <div className="absolute inset-0 opacity-5 dark:opacity-10" style={{ backgroundImage: 'linear-gradient(rgba(16,185,129,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.1) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
 
         <div className="flex-1 min-w-0 relative z-10">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse" title="En ligne" />
-            <h2 className="text-base md:text-lg font-mono font-bold text-neon-green uppercase tracking-wider" style={{ textShadow: '0 0 10px rgba(0,255,0,0.5)' }}>
-              • CHAT IA
+            <div className="w-2 h-2 bg-emerald-500 dark:bg-neon-green rounded-full animate-pulse" title="En ligne" />
+            <h2 className="text-base md:text-lg font-mono font-bold text-emerald-700 dark:text-neon-green uppercase tracking-wider dark:[text-shadow:0_0_10px_rgba(0,255,0,0.5)]">
+              CHAT IA
             </h2>
           </div>
           {(selectedZone && selectedZone.length > 0) ? (
-            <p className="text-xs md:text-sm text-neon-green/60 mt-0.5 truncate font-mono uppercase">
+            <p className="text-xs md:text-sm text-emerald-600 dark:text-neon-green/60 mt-0.5 truncate font-mono uppercase flex items-center gap-1">
+              <MapPin className="w-3 h-3" />
               {activeZone
-                ? `📍 Vue d'ensemble — ${activeZone}`
+                ? `Vue d'ensemble — ${activeZone}`
                 : selectedZone.length === 1
-                  ? `📍 Vue d'ensemble — ${selectedZone[0]}`
-                  : `📍 ${selectedZone.length} zones sélectionnées`
+                  ? `Vue d'ensemble — ${selectedZone[0]}`
+                  : `${selectedZone.length} zones sélectionnées`
               }
             </p>
           ) : (
-            <p className="text-xs md:text-sm text-neon-green/60 mt-0.5 truncate font-mono uppercase">
-              📍 Vue d'ensemble — Port-au-Prince
+            <p className="text-xs md:text-sm text-emerald-600 dark:text-neon-green/60 mt-0.5 truncate font-mono uppercase flex items-center gap-1">
+              <MapPin className="w-3 h-3" />
+              Vue d'ensemble — Port-au-Prince
             </p>
           )}
         </div>
@@ -234,7 +229,7 @@ const Chat = ({ onClose, isMobile }) => {
               e.stopPropagation()
               onClose()
             }}
-            className="relative z-10 ml-3 p-2 text-neon-green/70 hover:text-neon-green hover:bg-neon-green/10 border border-transparent hover:border-neon-green/30 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-green/50"
+            className="relative z-10 ml-3 p-2 text-emerald-600 dark:text-neon-green/70 hover:text-emerald-700 dark:hover:text-neon-green hover:bg-emerald-50 dark:hover:bg-neon-green/10 border border-transparent hover:border-emerald-300 dark:hover:border-neon-green/30 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-neon-green/50"
             aria-label="Fermer le chat"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,7 +240,7 @@ const Chat = ({ onClose, isMobile }) => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 bg-black">
+      <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 bg-white dark:bg-black">
         {messages.map((msg, index) => (
           <ChatMessage
             key={`${msg.timestamp}-${index}`}
@@ -258,12 +253,12 @@ const Chat = ({ onClose, isMobile }) => {
         {/* Indicateur de chargement pour les questions du chat */}
         {chatLoading && (
           <div className="flex items-start gap-3 mb-4 animate-fadeIn">
-            <div className="inline-block px-4 py-3 rounded-2xl bg-white dark:bg-gray-700/80 border border-gray-200 dark:border-gray-600 shadow-sm">
-              <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm">
+            <div className="inline-block px-4 py-3 rounded-2xl bg-emerald-50 dark:bg-gray-700/80 border border-emerald-200 dark:border-gray-600 shadow-sm">
+              <div className="flex items-center gap-2 text-emerald-700 dark:text-gray-400 text-sm">
                 <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  <div className="w-2 h-2 bg-emerald-500 dark:bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-emerald-500 dark:bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-emerald-500 dark:bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                 </div>
                 <span className="text-xs italic">Réflexion en cours</span>
               </div>
@@ -273,8 +268,8 @@ const Chat = ({ onClose, isMobile }) => {
 
         {/* Indicateur de chargement pour le chargement des données de zone (seulement si une zone est sélectionnée) */}
         {isLoading && activeZone && selectedZone && selectedZone.length > 0 && (
-          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm py-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent" />
+          <div className="flex items-center gap-2 text-emerald-600 dark:text-gray-400 text-sm py-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-500 dark:border-blue-500 border-t-transparent" />
             <span className="italic">Chargement des données de la zone...</span>
           </div>
         )}
@@ -283,27 +278,28 @@ const Chat = ({ onClose, isMobile }) => {
       </div>
 
       {/* Input */}
-      <div className="px-4 md:px-6 py-3 md:py-4 border-t border-neon-green/30 shrink-0 bg-black">
+      <div className="px-4 md:px-6 py-3 md:py-4 border-t border-emerald-200 dark:border-neon-green/30 shrink-0 bg-white dark:bg-black">
         <form onSubmit={handleSubmit}>
           <div className="flex gap-2">
             <input
               type="text"
+              color="black"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={isOnline ? "Tapez votre question ou message..." : "Hors ligne..."}
               disabled={chatLoading || !isOnline}
-              className="flex-1 px-4 py-3 text-sm md:text-base glass border-2 border-neon-green/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-green/50 focus:border-neon-green disabled:bg-gray-800 disabled:cursor-not-allowed bg-black text-neon-green placeholder-neon-green/40 font-mono"
+              className="flex-1 px-4 py-3 text-sm md:text-base border-2 border-emerald-200 dark:border-neon-green/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-neon-green/50 focus:border-emerald-500 dark:focus:border-neon-green disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed bg-white dark:bg-black text-black dark:text-neon-green placeholder-gray-600 dark:placeholder-neon-green/40 font-mono"
               aria-label="Message"
             />
             <button
               type="submit"
               disabled={!inputValue.trim() || chatLoading || !isOnline}
-              className="group relative px-5 py-3 text-sm md:text-base bg-neon-green/10 border-2 border-neon-green hover:bg-neon-green/20 text-neon-green rounded-lg transition-all duration-300 hover:shadow-neon-green active:scale-95 focus:outline-none focus:ring-2 focus:ring-neon-green/50 disabled:bg-gray-800 disabled:border-gray-700 disabled:text-gray-600 disabled:cursor-not-allowed disabled:shadow-none shrink-0 font-mono font-bold uppercase tracking-wider overflow-hidden"
+              className="group relative px-5 py-3 text-sm md:text-base bg-emerald-100 dark:bg-neon-green/10 border-2 border-emerald-500 dark:border-neon-green hover:bg-emerald-200 dark:hover:bg-neon-green/20 text-emerald-700 dark:text-neon-green rounded-lg transition-all duration-300 hover:shadow-md dark:hover:shadow-neon-green active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-neon-green/50 disabled:bg-gray-300 dark:disabled:bg-gray-800 disabled:border-gray-400 dark:disabled:border-gray-700 disabled:text-gray-500 dark:disabled:text-gray-600 disabled:cursor-not-allowed disabled:shadow-none shrink-0 font-mono font-bold uppercase tracking-wider overflow-hidden"
               aria-label="Envoyer le message"
             >
               <span className="relative z-10 flex items-center gap-1">
                 {isMobile ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="none" stroke="green" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                   </svg>
                 ) : (

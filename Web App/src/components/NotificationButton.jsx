@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useStore } from '../context/store'
-import { getNotifications } from '../api/api'
+import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../api/api'
+import { Bell, X, AlertTriangle, MapPin, Radio, Flame, Pin, Moon, CheckCircle2 } from 'lucide-react'
 
 const NotificationButton = () => {
   const isAuthenticated = useStore((state) => state.isAuthenticated)
@@ -31,6 +32,18 @@ const NotificationButton = () => {
           if (response && response.status === 'ok' && response.data) {
             setNotifications(response.data)
             console.log('🔔 Notifications chargées depuis NotificationButton:', response.data)
+            console.log('🔔 Détail des notifications:', response.data.notifications?.map(n => ({
+              id: n.id || n._id,
+              read: n.read,
+              is_read: n.is_read,
+              read_at: n.read_at,
+              message: n.message?.substring(0, 50),
+              allFields: Object.keys(n)
+            })))
+            // Log de la première notification complète pour voir tous les champs
+            if (response.data.notifications && response.data.notifications.length > 0) {
+              console.log('🔔 Première notification complète:', response.data.notifications[0])
+            }
           } else {
             console.log('🔔 Aucune notification disponible - réponse:', response)
             // Initialiser avec un tableau vide si aucune notification
@@ -99,6 +112,56 @@ const NotificationButton = () => {
     return text.length > maxLength
   }
 
+  // Fonction pour marquer une notification comme lue
+  const markAsRead = async (notificationId) => {
+    if (!notificationId) return
+    
+    try {
+      const response = await markNotificationAsRead(notificationId)
+      
+      if (response.status === 'ok') {
+        // Recharger les notifications pour mettre à jour l'état
+        const notifResponse = await getNotifications()
+        if (notifResponse.status === 'ok') {
+          setNotifications(notifResponse.data)
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors du marquage de la notification comme lue:', error)
+    }
+  }
+
+  // Fonction pour gérer le clic sur une notification
+  const handleNotificationClick = async (notification) => {
+    const notificationId = notification.id || notification._id
+    const isUnread = !notification.read || notification.read === false
+    
+    // Toujours ouvrir le modal pour afficher la notification complète
+    setSelectedNotification(notification)
+    
+    // Marquer comme lue quand on ouvre le modal
+    if (notificationId && isUnread) {
+      await markAsRead(notificationId)
+    }
+  }
+
+  // Fonction pour marquer toutes les notifications comme lues
+  const handleMarkAllAsRead = async () => {
+    try {
+      const response = await markAllNotificationsAsRead()
+      
+      if (response.status === 'ok') {
+        // Recharger les notifications pour mettre à jour l'état
+        const notifResponse = await getNotifications()
+        if (notifResponse.status === 'ok') {
+          setNotifications(notifResponse.data)
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors du marquage de toutes les notifications comme lues:', error)
+    }
+  }
+
   if (!isAuthenticated) {
     return null
   }
@@ -108,12 +171,10 @@ const NotificationButton = () => {
       {/* Notification Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-neon-green/70 hover:text-neon-green hover:bg-neon-green/10 border border-transparent hover:border-neon-green/30 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-green/50 hover:shadow-neon-green"
+        className="relative p-2 text-emerald-600 dark:text-neon-green/70 hover:text-emerald-700 dark:hover:text-neon-green hover:bg-emerald-50 dark:hover:bg-neon-green/10 border border-transparent hover:border-emerald-300 dark:hover:border-neon-green/30 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-neon-green/50 hover:shadow-md dark:hover:shadow-neon-green"
         aria-label="Notifications"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
+        <Bell className="w-5 h-5" />
         
         {/* Unread badge */}
         {unreadCount > 0 && (
@@ -125,14 +186,14 @@ const NotificationButton = () => {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 md:w-96 bg-black border-2 border-neon-green/30 rounded-lg shadow-neon-green-lg z-[4002] animate-scaleIn overflow-hidden">
+        <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white dark:bg-black border-2 border-emerald-200 dark:border-neon-green/30 rounded-lg shadow-lg dark:shadow-neon-green-lg z-[4002] animate-scaleIn overflow-hidden">
           {/* Header */}
-          <div className="px-4 py-3 border-b border-neon-green/20 bg-black/50 flex items-center justify-between">
-            <h3 className="text-neon-green font-bold font-mono uppercase tracking-wider text-sm">
+          <div className="px-4 py-3 border-b border-emerald-200 dark:border-neon-green/20 bg-gray-50/50 dark:bg-black/50 flex items-center justify-between">
+            <h3 className="text-emerald-700 dark:text-neon-green font-bold font-mono uppercase tracking-wider text-sm">
               Notifications
             </h3>
             {unreadCount > 0 && (
-              <span className="px-2 py-1 bg-neon-green/20 text-neon-green text-xs font-bold rounded">
+              <span className="px-2 py-1 bg-emerald-100 dark:bg-neon-green/20 text-emerald-700 dark:text-neon-green text-xs font-bold rounded">
                 {unreadCount} non lues
               </span>
             )}
@@ -141,13 +202,37 @@ const NotificationButton = () => {
           {/* Notifications List */}
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="px-4 py-8 text-center text-neon-green/60 text-sm">
+              <div className="px-4 py-8 text-center text-emerald-600 dark:text-neon-green/60 text-sm">
                 Aucune notification
               </div>
             ) : (
               <div className="divide-y divide-neon-green/10">
-                {notifications.map((notification) => {
-                  const isUnread = !notification.read || notification.read === false
+                {notifications.map((notification, index) => {
+                  // Vérifier si la notification est non lue
+                  // Essayer plusieurs champs possibles : read, is_read, read_at
+                  const readValue = notification.read
+                  const isReadValue = notification.is_read
+                  const readAtValue = notification.read_at
+                  
+                  // Une notification est non lue si :
+                  // - read est explicitement false, 0, null, ou undefined
+                  // - is_read est explicitement false
+                  // - read_at est null ou undefined (et read n'est pas true)
+                  // Si tous les champs sont undefined, utiliser unread_count comme fallback
+                  let isUnread = false
+                  
+                  if (readValue !== undefined) {
+                    isUnread = readValue === false || readValue === 0 || readValue === null
+                  } else if (isReadValue !== undefined) {
+                    isUnread = isReadValue === false
+                  } else if (readAtValue !== undefined) {
+                    isUnread = readAtValue === null || readAtValue === undefined
+                  } else {
+                    // Fallback: si tous les champs sont undefined, considérer les X premières comme non lues
+                    // où X = unreadCount
+                    isUnread = index < unreadCount
+                  }
+                  
                   const notificationMessage = notification.message || notification.content || notification.text || 'Notification'
                   const notificationTime = notification.created_at || notification.createdAt || notification.time
                   const isLong = isTextLong(notificationMessage)
@@ -155,33 +240,27 @@ const NotificationButton = () => {
                   return (
                     <div
                       key={notification.id || notification._id || Math.random()}
-                      className={`px-4 py-3 hover:bg-neon-green/5 transition-colors ${
-                        isLong ? 'cursor-pointer' : ''
-                      } ${
-                        isUnread ? 'bg-neon-green/5' : ''
+                      className={`px-4 py-3 hover:bg-emerald-50 dark:hover:bg-neon-green/5 transition-colors cursor-pointer ${
+                        isUnread ? 'bg-cyan-50 dark:bg-cyan-500/10' : ''
                       }`}
-                      onClick={() => {
-                        if (isLong) {
-                          setSelectedNotification(notification)
-                        }
-                      }}
+                      onClick={() => handleNotificationClick(notification)}
                     >
                       <div className="flex items-start gap-3">
                         <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${
-                          isUnread ? 'bg-neon-green animate-pulse' : 'bg-neon-green/30'
+                          isUnread ? 'bg-cyan-500 dark:bg-cyan-400 animate-pulse' : 'bg-emerald-400 dark:bg-neon-green/30'
                         }`} />
                         <div className="flex-1 min-w-0">
                           <p className={`text-sm ${
-                            isUnread ? 'text-neon-green font-semibold' : 'text-neon-green/70'
+                            isUnread ? 'text-cyan-600 dark:text-cyan-400 font-semibold' : 'text-emerald-700 dark:text-neon-green/70'
                           }`}>
-                            {isLong ? truncateText(notificationMessage) : notificationMessage}
+                            {notificationMessage}
                           </p>
                           {isLong && (
-                            <p className="text-xs text-neon-green/60 mt-1 font-mono italic">
+                            <p className="text-xs text-emerald-600 dark:text-neon-green/60 mt-1 font-mono italic">
                               Cliquer pour voir plus
                             </p>
                           )}
-                          <p className="text-xs text-neon-green/50 mt-1 font-mono">
+                          <p className="text-xs text-emerald-700 dark:text-neon-green/50 mt-1 font-mono">
                             {formatNotificationTime(notificationTime)}
                           </p>
                         </div>
@@ -194,11 +273,16 @@ const NotificationButton = () => {
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-2 border-t border-neon-green/20 bg-black/50">
-            <button className="w-full text-center text-neon-green/70 hover:text-neon-green text-xs font-mono uppercase transition-colors">
-              Voir toutes les notifications
-            </button>
-          </div>
+          {unreadCount > 0 && (
+            <div className="px-4 py-2 border-t border-emerald-200 dark:border-neon-green/20 bg-gray-50/50 dark:bg-black/50">
+              <button 
+                onClick={handleMarkAllAsRead}
+                className="w-full text-center text-emerald-700 dark:text-neon-green/70 hover:text-emerald-800 dark:hover:text-neon-green text-xs font-mono uppercase transition-colors"
+              >
+                Marquer tout comme lu
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -214,17 +298,17 @@ const NotificationButton = () => {
           {/* Modal */}
           <div className="fixed inset-0 z-[5001] flex items-center justify-center p-4 pointer-events-none">
             <div
-              className="glass-strong border-2 border-neon-green/30 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-neon-green-lg animate-scaleIn pointer-events-auto"
+              className="glass-strong border-2 border-emerald-200 dark:border-neon-green/30 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-xl dark:shadow-neon-green-lg animate-scaleIn pointer-events-auto bg-white dark:bg-gray-900"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between mb-4 pb-4 border-b border-neon-green/20">
-                <h3 className="text-lg font-bold text-neon-green font-mono uppercase tracking-wider">
+              <div className="flex items-center justify-between mb-4 pb-4 border-b border-emerald-200 dark:border-neon-green/20">
+                <h3 className="text-lg font-bold text-emerald-700 dark:text-neon-green font-mono uppercase tracking-wider">
                   Notification
                 </h3>
                 <button
                   onClick={() => setSelectedNotification(null)}
-                  className="p-2 text-neon-green/70 hover:text-neon-green hover:bg-neon-green/10 border border-transparent hover:border-neon-green/30 rounded-lg transition-all duration-300"
+                  className="p-2 text-emerald-600 dark:text-neon-green/70 hover:text-emerald-700 dark:hover:text-neon-green hover:bg-emerald-50 dark:hover:bg-neon-green/10 border border-transparent hover:border-emerald-300 dark:hover:border-neon-green/30 rounded-lg transition-all duration-300"
                   aria-label="Fermer"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,14 +322,18 @@ const NotificationButton = () => {
                 <div className="flex items-start gap-3">
                   <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${
                     !selectedNotification.read || selectedNotification.read === false
-                      ? 'bg-neon-green animate-pulse' 
-                      : 'bg-neon-green/30'
+                      ? 'bg-cyan-400 animate-pulse' 
+                      : 'bg-emerald-400 dark:bg-neon-green/30'
                   }`} />
                   <div className="flex-1">
-                    <p className="text-neon-green/90 text-sm leading-relaxed whitespace-pre-wrap">
+                    <p className={`text-sm leading-relaxed whitespace-pre-wrap ${
+                      !selectedNotification.read || selectedNotification.read === false
+                        ? 'text-cyan-600 dark:text-cyan-400' 
+                        : 'text-emerald-800 dark:text-neon-green/90'
+                    }`}>
                       {selectedNotification.message || selectedNotification.content || selectedNotification.text || 'Notification'}
                     </p>
-                    <p className="text-xs text-neon-green/50 mt-3 font-mono">
+                    <p className="text-xs text-emerald-600 dark:text-neon-green/50 mt-3 font-mono">
                       {formatNotificationTime(
                         selectedNotification.created_at || 
                         selectedNotification.createdAt || 

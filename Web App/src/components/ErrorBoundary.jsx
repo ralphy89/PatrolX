@@ -1,3 +1,5 @@
+import { AlertTriangle } from 'lucide-react'
+
 export class ErrorBoundary extends React.Component {
     constructor(props) {
       super(props)
@@ -17,7 +19,7 @@ export class ErrorBoundary extends React.Component {
         return (
           <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
             <div className="text-center p-8 max-w-md">
-              <div className="text-6xl mb-4">⚠️</div>
+              <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
                 Une erreur est survenue
               </h1>

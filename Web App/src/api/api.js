@@ -106,8 +106,8 @@ export const loginUser = async (username, password) => {
   }
 }
 
-// Fonction pour récupérer les notifications
-export const getNotifications = async (unreadOnly = true, limit = 50) => {
+// Fonction pour récupérer les notifications et fecth with timeout 30 seconds
+export const getNotifications = async (unreadOnly = false, limit = 50) => {
   try {
     console.log('[API] Fetching notifications:', { unreadOnly, limit })
 
@@ -158,6 +158,104 @@ export const getNotifications = async (unreadOnly = true, limit = 50) => {
       return {
         status: 'error',
         message: 'Erreur lors de la récupération des notifications. Veuillez réessayer.'
+      }
+    }
+  }
+}
+
+
+// Fonction pour marquer une notification comme lue
+export const markNotificationAsRead = async (notificationId) => {
+  try {
+    console.log('[API] Marking notification as read:', notificationId)
+
+    const response = await api.post(`/notifications`, { notificationId })
+
+    console.log('[API] Notification marked as read:', response.data)
+
+    return {
+      status: 'ok',
+      data: response.data
+    }
+  } catch (error) {
+    console.error('[API] Error marking notification as read:', error)
+
+    if (error.response) {
+      const status = error.response.status
+      const message = error.response.data?.message || error.response.data?.error || 'Erreur lors du marquage de la notification'
+
+      if (status === 401) {
+        return {
+          status: 'error',
+          message: 'Non autorisé. Veuillez vous connecter.',
+          code: 'UNAUTHORIZED'
+        }
+      } else if (status === 404) {
+        return {
+          status: 'error',
+          message: 'Notification non trouvée'
+        }
+      } else {
+        return {
+          status: 'error',
+          message: message || 'Erreur lors du marquage de la notification'
+        }
+      }
+    } else if (error.request) {
+      return {
+        status: 'error',
+        message: 'Impossible de se connecter au serveur. Vérifiez votre connexion internet.'
+      }
+    } else {
+      return {
+        status: 'error',
+        message: 'Erreur lors du marquage de la notification. Veuillez réessayer.'
+      }
+    }
+  }
+}
+
+// Fonction pour marquer toutes les notifications comme lues
+export const markAllNotificationsAsRead = async () => {
+  try {
+    console.log('[API] Marking all notifications as read')
+
+    const response = await api.post('/notifications/read-all')
+
+    console.log('[API] All notifications marked as read:', response.data)
+
+    return {
+      status: 'ok',
+      data: response.data
+    }
+  } catch (error) {
+    console.error('[API] Error marking all notifications as read:', error)
+
+    if (error.response) {
+      const status = error.response.status
+      const message = error.response.data?.message || error.response.data?.error || 'Erreur lors du marquage des notifications'
+
+      if (status === 401) {
+        return {
+          status: 'error',
+          message: 'Non autorisé. Veuillez vous connecter.',
+          code: 'UNAUTHORIZED'
+        }
+      } else {
+        return {
+          status: 'error',
+          message: message || 'Erreur lors du marquage des notifications'
+        }
+      }
+    } else if (error.request) {
+      return {
+        status: 'error',
+        message: 'Impossible de se connecter au serveur. Vérifiez votre connexion internet.'
+      }
+    } else {
+      return {
+        status: 'error',
+        message: 'Erreur lors du marquage des notifications. Veuillez réessayer.'
       }
     }
   }

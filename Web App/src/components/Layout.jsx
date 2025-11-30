@@ -5,6 +5,7 @@ import { useStore } from '../context/store'
 import Logo from './Logo'
 import NotificationButton from './NotificationButton'
 import useSessionTimeout from '../hooks/useSessionTimeout'
+import { AlertTriangle } from 'lucide-react'
 
 // Lazy loading des composants lourds
 const SidebarPriority = lazy(() => import('./SidebarPriority'))
@@ -80,7 +81,7 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
           <div className="text-center p-8 max-w-md">
-            <div className="text-6xl mb-4">⚠️</div>
+            <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
               Une erreur est survenue
             </h1>
@@ -156,19 +157,78 @@ const Layout = () => {
   // Gestion du timeout de session (5 minutes d'inactivité)
   useSessionTimeout(5)
 
-  // Initialiser le mode dark depuis SafeStorage (localStorage sécurisé)
-  // Default to dark mode for neon theme
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window === 'undefined') return true
+  // Fonction pour détecter la préférence système
+  const getSystemPreference = () => {
+    if (typeof window === 'undefined') return false
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  }
 
-    const saved = SafeStorage.get('darkMode', true)
-    if (saved) {
+  // Initialiser le mode dark avec détection de préférence système
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window === 'undefined') return false
+
+    // Vérifier si l'utilisateur a déjà fait un choix (saved dans localStorage)
+    const savedPreference = SafeStorage.get('darkMode', null)
+    
+    // Si l'utilisateur a déjà fait un choix, l'utiliser
+    if (savedPreference !== null) {
+      const isDark = savedPreference === true
+      if (isDark) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+      return isDark
+    }
+
+    // Sinon, utiliser la préférence système par défaut
+    const systemPrefersDark = getSystemPreference()
+    if (systemPrefersDark) {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')
     }
-    return saved
+    return systemPrefersDark
   })
+
+  // Écouter les changements de préférence système
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    
+    // Fonction pour gérer le changement
+    const handleSystemThemeChange = (e) => {
+      // Seulement appliquer si l'utilisateur n'a pas fait de choix manuel
+      const savedPreference = SafeStorage.get('darkMode', null)
+      if (savedPreference === null) {
+        // Pas de préférence sauvegardée, suivre le système
+        const prefersDark = e.matches
+        setIsDarkMode(prefersDark)
+        if (prefersDark) {
+          document.documentElement.classList.add('dark')
+        } else {
+          document.documentElement.classList.remove('dark')
+        }
+      }
+    }
+
+    // Ajouter l'écouteur
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleSystemThemeChange)
+    } else {
+      // Fallback pour les anciens navigateurs
+      mediaQuery.addListener(handleSystemThemeChange)
+    }
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleSystemThemeChange)
+      } else {
+        mediaQuery.removeListener(handleSystemThemeChange)
+      }
+    }
+  }, [])
 
   // Appliquer le thème quand il change
   useEffect(() => {
@@ -209,26 +269,26 @@ const Layout = () => {
 
   return (
     <ErrorBoundary>
-      <div className="h-screen flex flex-col relative bg-black transition-all duration-500">
+      <div className="h-screen flex flex-col relative bg-white dark:bg-black transition-all duration-500">
         {/* Notice hors ligne */}
         <OfflineNotice />
 
         {/* ==========================================
             HEADER avec logo et contrôles
             ========================================== */}
-        <div className="h-14 md:h-16 bg-black border-b border-neon-green/30 flex items-center justify-between px-4 md:px-6 shrink-0 shadow-neon-green relative z-[4000] overflow-visible">
+        <div className="h-14 md:h-16 bg-gray-50 dark:bg-black border-b border-emerald-200 dark:border-neon-green/30 flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm dark:shadow-neon-green relative z-[4000] overflow-visible">
           {/* Subtle grid pattern background */}
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(rgba(0,255,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,0,0.1) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+          <div className="absolute inset-0 opacity-5 dark:opacity-10" style={{ backgroundImage: 'linear-gradient(rgba(16,185,129,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.1) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
 
           {/* Logo et titre */}
           <div className="flex items-center gap-2 md:gap-3 relative z-10">
             <div className="transition-transform duration-300 hover:scale-110">
               <Logo width={isMobile ? 28 : 32} height={isMobile ? 28 : 32} />
             </div>
-            <h1 className="text-lg md:text-xl font-bold text-neon-green uppercase tracking-wider" style={{ textShadow: '0 0 10px rgba(0,255,0,0.5)' }}>
+            <h1 className="text-lg md:text-xl font-bold text-emerald-600 dark:text-neon-green uppercase tracking-wider dark:[text-shadow:0_0_10px_rgba(0,255,0,0.5)]">
               Patrol-X
             </h1>
-            <div className="hidden md:block px-2 py-1 bg-neon-green/10 border border-neon-green/50 text-neon-green text-xs font-mono font-semibold rounded uppercase">
+            <div className="hidden md:block px-2 py-1 bg-emerald-50 dark:bg-neon-green/10 border border-emerald-300 dark:border-neon-green/50 text-emerald-700 dark:text-neon-green text-xs font-mono font-semibold rounded uppercase">
               Système Online
             </div>
           </div>
@@ -241,7 +301,7 @@ const Layout = () => {
             {/* Bouton toggle dark/light mode */}
             <button
               onClick={toggleDarkMode}
-              className="group p-2 text-neon-green/70 hover:text-neon-green hover:bg-neon-green/10 border border-transparent hover:border-neon-green/30 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-green/50 hover:shadow-neon-green"
+              className="group p-2 text-emerald-600 dark:text-neon-green/70 hover:text-emerald-700 dark:hover:text-neon-green hover:bg-emerald-50 dark:hover:bg-neon-green/10 border border-transparent hover:border-emerald-300 dark:hover:border-neon-green/30 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-neon-green/50 hover:shadow-md dark:hover:shadow-neon-green"
               aria-label={isDarkMode ? 'Activer le mode clair' : 'Activer le mode sombre'}
             >
               {isDarkMode ? (
@@ -261,7 +321,7 @@ const Layout = () => {
                 logout()
                 navigate('/login')
               }}
-              className="p-2 text-neon-green/70 hover:text-neon-green hover:bg-neon-green/10 border border-transparent hover:border-neon-green/30 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-green/50 hover:shadow-neon-green"
+              className="p-2 text-emerald-600 dark:text-neon-green/70 hover:text-emerald-700 dark:hover:text-neon-green hover:bg-emerald-50 dark:hover:bg-neon-green/10 border border-transparent hover:border-emerald-300 dark:hover:border-neon-green/30 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-neon-green/50 hover:shadow-md dark:hover:shadow-neon-green"
               aria-label="Déconnexion"
               title={user ? `Déconnexion (${user.name || user.email})` : 'Déconnexion'}
             >
@@ -274,7 +334,7 @@ const Layout = () => {
             {isMobile && (
               <button
                 onClick={() => setIsPrioritiesOpen(!isPrioritiesOpen)}
-                className="p-2 text-neon-green/70 hover:text-neon-green hover:bg-neon-green/10 border border-transparent hover:border-neon-green/30 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-green/50 hover:shadow-neon-green"
+                className="p-2 text-emerald-600 dark:text-neon-green/70 hover:text-emerald-700 dark:hover:text-neon-green hover:bg-emerald-50 dark:hover:bg-neon-green/10 border border-transparent hover:border-emerald-300 dark:hover:border-neon-green/30 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-neon-green/50 hover:shadow-md dark:hover:shadow-neon-green"
                 aria-label="Menu"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -292,7 +352,7 @@ const Layout = () => {
 
           {/* Desktop: Colonne gauche - État des lieux (toujours visible) */}
           {!isMobile && (
-            <div className="w-1/3 lg:w-1/4 border-r border-neon-green/20 bg-black">
+            <div className="w-1/3 lg:w-1/4 border-r border-neon-green/20 bg-gray-50 dark:bg-black">
               <Suspense fallback={<LoadingSpinner message="Chargement..." />}>
                 <SidebarPriority onZoneSelect={() => setIsChatOpen(true)} />
               </Suspense>
@@ -311,25 +371,25 @@ const Layout = () => {
 
               {/* Drawer qui slide depuis la gauche */}
               <div
-                className="fixed left-0 top-0 bottom-0 w-[85%] max-w-sm bg-black border-r border-neon-green/30 shadow-neon-green-lg z-[2001] transform transition-transform"
+                className="fixed left-0 top-0 bottom-0 w-[85%] max-w-sm bg-gray-50 dark:bg-black border-r border-neon-green/30 shadow-neon-green-lg z-[2001] transform transition-transform"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header du drawer */}
-                <div className="flex items-center justify-between px-4 py-4 border-b border-neon-green/30 bg-black relative overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-4 border-b border-neon-green/30 bg-gray-50 dark:bg-black relative overflow-hidden">
                   {/* Subtle grid pattern background */}
                   <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(rgba(0,255,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,0,0.1) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
 
                   <div className="relative z-10">
-                    <h2 className="text-lg font-mono font-bold text-neon-green uppercase tracking-wider" style={{ textShadow: '0 0 10px rgba(0,255,0,0.5)' }}>
+                    <h2 className="text-lg font-mono font-bold text-emerald-700 dark:text-neon-green uppercase tracking-wider dark:[text-shadow:0_0_10px_rgba(0,255,0,0.5)]">
                       • État des lieux
                     </h2>
-                    <p className="text-xs text-neon-green/60 mt-0.5 font-mono uppercase">
+                    <p className="text-xs text-emerald-600/80 dark:text-neon-green/60 mt-0.5 font-mono uppercase">
                       Vue d'ensemble et priorités
                     </p>
                   </div>
                   <button
                     onClick={() => setIsPrioritiesOpen(false)}
-                    className="relative z-10 p-2 text-neon-green/70 hover:text-neon-green hover:bg-neon-green/10 border border-transparent hover:border-neon-green/30 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-green/50"
+                    className="relative z-10 p-2 text-emerald-600 dark:text-neon-green/70 hover:text-emerald-700 dark:hover:text-neon-green hover:bg-emerald-50 dark:hover:bg-neon-green/10 border border-transparent hover:border-emerald-300 dark:hover:border-neon-green/30 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-neon-green/50"
                     aria-label="Fermer"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,8 +419,8 @@ const Layout = () => {
               {!isChatOpen && (
               <button
                 onClick={() => setIsChatOpen(true)}
-                className="group fixed md:absolute bottom-8 md:bottom-10 right-6 md:right-6 z-[1001] bg-gray-900/90 border border-neon-green/50 text-neon-green p-4 rounded-full hover:bg-gray-800 hover:border-neon-green transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-neon-green/50 backdrop-blur-sm"
-                style={{ boxShadow: '0 0 20px rgba(0, 255, 0, 0.3), inset 0 0 10px rgba(0, 255, 0, 0.1)' }}
+                className="group fixed md:absolute bottom-8 md:bottom-10 right-6 md:right-6 z-[1001] bg-emerald-50 dark:bg-gray-900/90 border-2 border-emerald-500 dark:border-neon-green/50 text-emerald-600 dark:text-neon-green p-4 rounded-full hover:bg-emerald-100 dark:hover:bg-gray-800 hover:border-emerald-600 dark:hover:border-neon-green transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-neon-green/50 backdrop-blur-sm shadow-lg"
+                style={{ boxShadow: 'var(--mode) === "dark" ? "0 0 20px rgba(0, 255, 0, 0.3), inset 0 0 10px rgba(0, 255, 0, 0.1)" : "0 4px 20px rgba(16, 185, 129, 0.2)"' }}
                 aria-label="Ouvrir le chat"
               >
                 {/* Cercle d'onde animé subtil */}

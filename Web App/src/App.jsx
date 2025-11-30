@@ -15,7 +15,7 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <div className="App">
+    <div className="App">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -23,13 +23,13 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <Layout />
+      <Layout />
               </ProtectedRoute>
             }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </div>
+    </div>
     </Router>
   )
 }

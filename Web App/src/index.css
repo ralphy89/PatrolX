@@ -9,31 +9,40 @@
    VARIABLES CSS PERSONNALISÉES
    ========================================== */
 :root {
-  /* Neon Colors */
-  --neon-green: #00ff00;
-  --neon-green-light: #00ff41;
-  --neon-green-dark: #00cc00;
-  --neon-cyan: #00ffff;
-  --neon-pink: #ff00ff;
-  --neon-orange: #ff6600;
-  --neon-red: #ff0000;
+  /* Neon Colors - Mode Light (couleurs plus douces et harmonieuses) */
+  --neon-green: #10b981; /* Emerald-500 - vert émeraude pour mode light */
+  --neon-green-light: #34d399; /* Emerald-400 */
+  --neon-green-dark: #059669; /* Emerald-600 */
+  --neon-cyan: #06b6d4; /* Cyan-500 */
+  --neon-pink: #ec4899; /* Pink-500 */
+  --neon-orange: #f97316; /* Orange-500 */
+  --neon-red: #ef4444; /* Red-500 */
 
-  /* Gradients modernes */
-  --gradient-primary: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
-  --gradient-neon-green: linear-gradient(135deg, #00ff41 0%, #00cc00 100%);
-  --gradient-blue: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-  --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
-  --gradient-pink: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
-  --gradient-shimmer: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.3), transparent);
+  /* Text colors - Mode Light */
+  --text-primary: #1f2937; /* Gray-800 */
+  --text-secondary: #4b5563; /* Gray-600 */
+  --text-muted: #6b7280; /* Gray-500 */
+  --text-accent: #059669; /* Emerald-600 */
 
-  /* Ombres élégantes */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 20px rgba(0, 255, 0, 0.5);
-  --shadow-neon-green: 0 0 10px rgba(0, 255, 0, 0.5), 0 0 20px rgba(0, 255, 0, 0.3);
-  --shadow-neon-pink: 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(255, 0, 255, 0.3);
+  /* Background colors - Mode Light */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb; /* Gray-50 */
+  --bg-tertiary: #f3f4f6; /* Gray-100 */
+  --bg-accent: #ecfdf5; /* Emerald-50 */
+
+  /* Border colors - Mode Light */
+  --border-primary: #e5e7eb; /* Gray-200 */
+  --border-accent: #a7f3d0; /* Emerald-200 */
+  --border-accent-strong: #6ee7b7; /* Emerald-300 */
+
+  /* Ombres élégantes - Mode Light */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.3);
+  --shadow-neon-green: 0 0 10px rgba(16, 185, 129, 0.4), 0 0 20px rgba(16, 185, 129, 0.2);
+  --shadow-neon-pink: 0 0 10px rgba(236, 72, 153, 0.4), 0 0 20px rgba(236, 72, 153, 0.2);
 
   /* Animations */
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -42,7 +51,130 @@
 
 /* Dark mode variables */
 .dark {
+  /* Neon Colors - Mode Dark (couleurs vives originales) */
+  --neon-green: #00ff00;
+  --neon-green-light: #00ff41;
+  --neon-green-dark: #00cc00;
+  --neon-cyan: #00ffff;
+  --neon-pink: #ff00ff;
+  --neon-orange: #ff6600;
+  --neon-red: #ff0000;
+
+  /* Text colors - Mode Dark */
+  --text-primary: #f9fafb; /* Gray-50 */
+  --text-secondary: #d1d5db; /* Gray-300 */
+  --text-muted: #9ca3af; /* Gray-400 */
+  --text-accent: #00ff00;
+
+  /* Background colors - Mode Dark */
+  --bg-primary: #000000;
+  --bg-secondary: #111827; /* Gray-900 */
+  --bg-tertiary: #1f2937; /* Gray-800 */
+  --bg-accent: #064e3b; /* Emerald-900 */
+
+  /* Border colors - Mode Dark */
+  --border-primary: rgba(0, 255, 0, 0.2);
+  --border-accent: rgba(0, 255, 0, 0.3);
+  --border-accent-strong: rgba(0, 255, 0, 0.5);
+
+  /* Ombres élégantes - Mode Dark */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
   --shadow-glow: 0 0 20px rgba(0, 255, 0, 0.6);
+  --shadow-neon-green: 0 0 10px rgba(0, 255, 0, 0.5), 0 0 20px rgba(0, 255, 0, 0.3);
+  --shadow-neon-pink: 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+/* Map background adaptatif */
+.map-background {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%);
+}
+
+.dark .map-background {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+}
+
+/* Classes utilitaires pour couleurs adaptatives */
+.text-accent {
+  color: var(--text-accent);
+}
+
+.text-accent-muted {
+  color: var(--text-secondary);
+}
+
+.bg-accent-subtle {
+  background-color: var(--bg-accent);
+}
+
+.border-accent {
+  border-color: var(--border-accent);
+}
+
+.border-accent-strong {
+  border-color: var(--border-accent-strong);
+}
+
+/* Ajustements pour le mode light */
+:root:not(.dark) {
+  /* Texte neon-green devient émeraude en mode light */
+  .text-neon-green {
+    color: #059669; /* Emerald-600 */
+  }
+  
+  .text-neon-green\/70 {
+    color: rgba(5, 150, 105, 0.7); /* Emerald-600 avec opacité */
+  }
+  
+  .text-neon-green\/60 {
+    color: rgba(5, 150, 105, 0.6);
+  }
+  
+  .text-neon-green\/50 {
+    color: rgba(5, 150, 105, 0.5);
+  }
+  
+  /* Bordures plus subtiles en mode light */
+  .border-neon-green\/30 {
+    border-color: rgba(16, 185, 129, 0.2); /* Emerald-500 avec opacité réduite */
+  }
+  
+  .border-neon-green\/20 {
+    border-color: rgba(16, 185, 129, 0.15);
+  }
+  
+  .border-neon-green\/50 {
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+  
+  /* Backgrounds plus subtils */
+  .bg-neon-green\/10 {
+    background-color: rgba(236, 253, 245, 0.8); /* Emerald-50 avec opacité */
+  }
+  
+  .bg-neon-green\/20 {
+    background-color: rgba(209, 250, 229, 0.6); /* Emerald-200 avec opacité */
+  }
+  
+  .bg-neon-green\/5 {
+    background-color: rgba(236, 253, 245, 0.5);
+  }
+  
+  /* Ombres plus subtiles */
+  .shadow-neon-green {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.2), 0 0 20px rgba(16, 185, 129, 0.1);
+  }
+  
+  .shadow-neon-green-lg {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.25), 0 0 40px rgba(16, 185, 129, 0.15);
+  }
+  
+  /* Text shadow plus subtil */
+  [style*="textShadow"] {
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.3) !important;
+  }
 }
 
 /* ==========================================

@@ -410,10 +410,156 @@ app.post('/api/signup', async (req, res) => {
   }
 })
 
+// POST /api/notifications - Marquer une notification comme lue
+app.post('/api/notifications', async (req, res) => {
+  if (!API_CTR_CENTER_URL) {
+    return res.status(500).json({
+      error: 'API_CTR_CENTER_URL is not configured on the server',
+    })
+  }
+
+  const notificationId = req.body.notificationId
+
+  if (!notificationId) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'notificationId est requis'
+    })
+  }
+
+  const url = `${API_CTR_CENTER_URL}/notifications/${notificationId}/read`
+
+  console.log('[backend] POST /api/notifications - Marking notification as read')
+  console.log('[backend] Notification ID:', notificationId)
+  console.log('[backend] Calling:', url)
+
+  try {
+    // Récupérer le token du header Authorization si présent
+    const authHeader = req.headers.authorization
+    const headers = {
+      'Content-Type': 'application/json',
+      accept: 'application/json',
+    }
+
+    // Ajouter le token si présent
+    if (authHeader) {
+      headers.Authorization = authHeader
+      console.log('[backend] Forwarding Authorization header to CTR Center')
+    } else {
+      console.warn('[backend] No Authorization header found')
+    }
+
+    const response = await axios.post(url, {}, { headers })
+
+    console.log('[backend] Notification marked as read:', response.data)
+    res.json(response.data)
+
+  } catch (error) {
+    console.error('[backend] Error marking notification as read:', error.message)
+
+    if (error.response) {
+      const status = error.response.status
+      const message = error.response.data?.message || error.response.data?.error || 'Erreur lors du marquage de la notification'
+
+      if (status === 401) {
+        return res.status(401).json({
+          status: 'error',
+          message: 'Non autorisé. Veuillez vous connecter.',
+          code: 'UNAUTHORIZED'
+        })
+      } else if (status === 404) {
+        return res.status(404).json({
+          status: 'error',
+          message: 'Notification non trouvée'
+        })
+      } else {
+        return res.status(status).json({
+          status: 'error',
+          message: message || 'Erreur lors du marquage de la notification'
+        })
+      }
+    } else if (error.request) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Impossible de se connecter au serveur. Vérifiez votre connexion internet.'
+      })
+    } else {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Erreur lors du marquage de la notification. Veuillez réessayer.'
+      })
+    }
+  }
+})
+
+// POST /api/notifications/read-all - Marquer toutes les notifications comme lues
+app.post('/api/notifications/read-all', async (req, res) => {
+  if (!API_CTR_CENTER_URL) {
+    return res.status(500).json({
+      error: 'API_CTR_CENTER_URL is not configured on the server',
+    })
+  }
+
+  const url = `${API_CTR_CENTER_URL}/notifications/read-all`
+
+  console.log('[backend] POST /api/notifications/read-all - Marking all notifications as read')
+  console.log('[backend] Calling:', url)
+
+  try {
+    // Récupérer le token du header Authorization si présent
+    const authHeader = req.headers.authorization
+    const headers = {
+      'Content-Type': 'application/json',
+      accept: 'application/json',
+    }
+
+    // Ajouter le token si présent
+    if (authHeader) {
+      headers.Authorization = authHeader
+      console.log('[backend] Forwarding Authorization header to CTR Center')
+    } else {
+      console.warn('[backend] No Authorization header found')
+    }
+
+    const response = await axios.post(url, {}, { headers })
+
+    console.log('[backend] All notifications marked as read:', response.data)
+    res.json(response.data)
+
+  } catch (error) {
+    console.error('[backend] Error marking all notifications as read:', error.message)
+
+    if (error.response) {
+      const status = error.response.status
+      const message = error.response.data?.message || error.response.data?.error || 'Erreur lors du marquage des notifications'
+
+      if (status === 401) {
+        return res.status(401).json({
+          status: 'error',
+          message: 'Non autorisé. Veuillez vous connecter.',
+          code: 'UNAUTHORIZED'
+        })
+      } else {
+        return res.status(status).json({
+          status: 'error',
+          message: message || 'Erreur lors du marquage des notifications'
+        })
+      }
+    } else if (error.request) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Impossible de se connecter au serveur. Vérifiez votre connexion internet.'
+      })
+    } else {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Erreur lors du marquage des notifications. Veuillez réessayer.'
+      })
+    }
+  }
+})
 app.listen(PORT, () => {
   console.log(`[backend] Server listening on port ${PORT}`)
   console.log(`[backend] Health check: http://localhost:${PORT}/api/health`)
   console.log(`[backend] Chat endpoint: http://localhost:${PORT}/api/ask`)
 })
-
-
