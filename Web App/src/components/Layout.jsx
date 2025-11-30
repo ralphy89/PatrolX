@@ -181,14 +181,9 @@ const Layout = () => {
       return isDark
     }
 
-    // Sinon, utiliser la préférence système par défaut
-    const systemPrefersDark = getSystemPreference()
-    if (systemPrefersDark) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-    return systemPrefersDark
+    // Sinon, utiliser le mode dark par défaut
+    document.documentElement.classList.add('dark')
+    return true
   })
 
   // Écouter les changements de préférence système
